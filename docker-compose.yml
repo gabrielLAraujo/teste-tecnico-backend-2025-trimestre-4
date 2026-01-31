@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: npm start
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/cep-crawler
+      - ELASTICMQ_URL=http://elasticmq:9324
+      - QUEUE_URL=http://elasticmq:9324/queue/cep-queue
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=x
+      - AWS_SECRET_ACCESS_KEY=x
+      - PORT=3000
+    depends_on:
+      - mongodb
+      - elasticmq
+    networks:
+      - cep-network
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: npm run start:worker
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/cep-crawler
+      - ELASTICMQ_URL=http://elasticmq:9324
+      - QUEUE_URL=http://elasticmq:9324/queue/cep-queue
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=x
+      - AWS_SECRET_ACCESS_KEY=x
+      - RATE_LIMIT_PER_SECOND=5
+    depends_on:
+      - mongodb
+      - elasticmq
+    networks:
+      - cep-network
+
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - cep-network
+
+  elasticmq:
+    image: softwaremill/elasticmq-native:latest
+    ports:
+      - "9324:9324"
+      - "9325:9325"
+    volumes:
+      - ./elasticmq.conf:/opt/elasticmq.conf
+    command: ["-Dconfig.file=/opt/elasticmq.conf"]
+    networks:
+      - cep-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  cep-network:
+    driver: bridge
