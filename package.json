@@ -1,0 +1,36 @@
+{
+  "name": "cep-crawler",
+  "version": "1.0.0",
+  "description": "Crawler assíncrono de CEPs com Fastify, MongoDB e ElasticMQ",
+  "main": "dist/src/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/src/server.js",
+    "start:worker": "node dist/worker/worker.js",
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "dev:worker": "nodemon --exec ts-node worker/worker.ts",
+    "docker:up": "docker-compose up",
+    "docker:down": "docker-compose down",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up"
+  },
+  "keywords": ["cep", "crawler", "fastify", "mongodb", "sqs"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "fastify": "^4.24.3",
+    "@fastify/cors": "^8.4.0",
+    "mongoose": "^8.0.3",
+    "@aws-sdk/client-sqs": "^3.490.0",
+    "dotenv": "^16.3.1",
+    "uuid": "^9.0.1",
+    "p-limit": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/uuid": "^9.0.7",
+    "nodemon": "^3.0.2",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
